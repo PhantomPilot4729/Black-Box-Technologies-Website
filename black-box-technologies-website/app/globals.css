@@ -1,25 +1,44 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
+@font-face {
+  font-family: 'NEMESYS';
+  src: url(/fonts/NEMESYS-Regular.ttf) format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #050a0e;
+  --background-secondary: #0a1520; 
+  --background-hover: #0d1b2a;
+  --neon-cyan: #00f5ff;
+  --hover-cyan: #00c8d4;
+  --neon-yellow: #f5e642;
+  --hover-yellow: #ffe800;
+  --neon-red: #ff003c;
+  --hover-red: #cc0022;
+  --text-primary: #c8e8f0;
+  --text-secondary: #5a8fa8;
 }
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
 
 html,
 body {
-  max-width: 100vw;
+  /*max-width: 100vw;*/
   overflow-x: hidden;
 }
 
 body {
-  color: var(--foreground);
+  color: var(--text-primary);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Source Code Pro", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -35,8 +54,57 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
+body::before{
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    transparent 4px,
+    #00f5ff08 2px,
+    #00f5ff08 4px
+  );
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 60%,
+    rgba(0,0,0,0.7) 100%
+  );
+}
+
+h1, h2, h3 {
+  font-family: 'NEMESYS', sans-serif;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px #00f5ff88, 0 0 20px #00f5ff44;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+p{
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/*@media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
-}
+}*/

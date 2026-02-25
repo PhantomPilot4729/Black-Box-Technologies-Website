@@ -1,4 +1,4 @@
-import Image from "next/image";
+/*import Image from "next/image";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -63,4 +63,12 @@ export default function Home() {
       </main>
     </div>
   );
+}*/
+
+export default function Home() {
+  return (
+    <main>
+      <h1>Black Box Technologies</h1>
+    </main>
+  )
 }
