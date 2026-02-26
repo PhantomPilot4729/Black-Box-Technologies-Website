@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
   const options = await generateAuthenticationOptions({
     rpID: RP_ID,
-    allowCredentials: user.credentials.map((cred) => ({
+    allowCredentials: user.credentials.map((cred: { credentialId: string }) => ({
       id: cred.credentialId,
     })),
     userVerification: "preferred",
