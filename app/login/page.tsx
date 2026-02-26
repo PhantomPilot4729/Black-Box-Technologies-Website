@@ -77,30 +77,40 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-      <h1 className="text-2xl font-bold">Login with YubiKey</h1>
-      <input
-        type="email"
-        placeholder="Enter your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="border p-2 rounded w-64"
-      />
-      <div className="flex gap-4">
-        <button
-          onClick={handleRegister}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          Register YubiKey
-        </button>
-        <button
-          onClick={handleLogin}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-        >
-          Login with YubiKey
-        </button>
-      </div>
-      {status && <p className="mt-4">{status}</p>}
-    </div>
+    <main>
+      <section className="page-hero">
+        <h1>SECURE LOGIN</h1>
+        <p>Authenticate using your YubiKey security token</p>
+      </section>
+
+      <section className="contact-section">
+        <div className="contact-form-wrapper" style={{ maxWidth: "480px", margin: "0 auto" }}>
+          <h2>YUBIKEY AUTHENTICATION</h2>
+          <div className="contact-form">
+            <div className="form-group">
+              <label htmlFor="email">EMAIL</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="Your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+              <button className="btn-primary" onClick={handleRegister}>
+                REGISTER YUBIKEY
+              </button>
+              <button className="btn-primary" onClick={handleLogin}>
+                LOGIN
+              </button>
+            </div>
+            {status && (
+              <p style={{ marginTop: "1rem", color: "var(--neon-cyan)" }}>{status}</p>
+            )}
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
