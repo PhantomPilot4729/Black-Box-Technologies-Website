@@ -62,12 +62,3 @@ export default function Dashboard() {
     </main>
   );
 }
-
-          onClick={() => signOut({ callbackUrl: "/" })}
-        >
-          SIGN OUT
-        </button>
-      </section>
-    </main>
-  );
-}
