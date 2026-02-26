@@ -151,11 +151,11 @@ export default function LoginPage() {
                   <button className="btn-primary" onClick={handleYubikeyLogin}>
                     LOGIN
                   </button>
-                  <button className="btn-secondary" onClick={handleRegister}>
-                    REGISTER KEY
-                  </button>
                 </div>
               </div>
+              <p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>
+                To register a new YubiKey, log in and visit <b>Account Settings</b> in the dashboard.
+              </p>
             </>
           )}
 
