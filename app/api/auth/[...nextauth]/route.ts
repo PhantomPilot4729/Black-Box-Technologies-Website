@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { prisma } from "@/lib/prisma";
 
 const handler = NextAuth({
   providers: [
@@ -10,16 +11,14 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const validEmail = process.env.ADMIN_EMAIL;
+        if (!credentials?.email || !credentials?.password) return null;
+        // Find user in database
+        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+        if (!user) return null;
+        // For now, compare password to env var (later: store hashed passwords)
         const validPassword = process.env.ADMIN_PASSWORD;
-
-        if (
-          validEmail &&
-          validPassword &&
-          credentials?.email === validEmail &&
-          credentials?.password === validPassword
-        ) {
-          return { id: "1", email: validEmail };
+        if (credentials.password === validPassword) {
+          return { id: user.id, email: user.email, role: user.role };
         }
         return null;
       },
@@ -29,6 +28,16 @@ const handler = NextAuth({
     signIn: "/login",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async session({ session, token }) {
+      if (token?.role) session.user.role = token.role;
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user?.role) token.role = user.role;
+      return token;
+    },
+  },
 });
 
 export { handler as GET, handler as POST };
