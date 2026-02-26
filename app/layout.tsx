@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { SessionProvider } from "next-auth/react";
+import SessionWrapper from "../components/SessionWrapper";
 
 export const metadata: Metadata = {
   title: "Black Box Technologies",
@@ -17,11 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProvider>
+        <SessionWrapper>
           <Navbar />
           {children}
           <Footer />
-        </SessionProvider>
+        </SessionWrapper>
       </body>
     </html>
   );
