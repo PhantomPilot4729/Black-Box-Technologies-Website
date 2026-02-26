@@ -245,6 +245,7 @@ main{
   padding: 0.75rem 2rem;
   transition: all 0.2s ease;
   color: var(--neon-cyan);
+  background-color: var(--background);
   clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
 }
 
@@ -256,6 +257,7 @@ main{
 
 .btn-dark {
   background: var(--background);
+  color: var(--text-primary);
 }
 
 .services-snapshot {
