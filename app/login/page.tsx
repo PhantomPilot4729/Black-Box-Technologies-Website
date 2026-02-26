@@ -1,67 +1,106 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  startRegistration,
+  startAuthentication,
+} from "@simplewebauthn/browser";
 
-export default function Login() {
-  const router = useRouter();
+export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+  async function handleRegister() {
+    try {
+      setStatus("Starting registration...");
+      const optionsRes = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const options = await optionsRes.json();
 
-    if (result?.ok) {
-      router.push("/dashboard");
-    } else {
-      setError("Invalid email or password.");
+      const registrationResponse = await startRegistration({ optionsJSON: options });
+
+      const verifyRes = await fetch("/api/auth/register/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          registrationResponse,
+          expectedChallenge: options.challenge,
+        }),
+      });
+      const result = await verifyRes.json();
+
+      if (result.verified) {
+        setStatus("✅ YubiKey registered successfully!");
+      } else {
+        setStatus("❌ Registration failed.");
+      }
+    } catch (err) {
+      setStatus(`❌ Error: ${err}`);
     }
-  };
+  }
+
+  async function handleLogin() {
+    try {
+      setStatus("Starting authentication...");
+      const optionsRes = await fetch("/api/auth/authenticate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const options = await optionsRes.json();
+
+      const authenticationResponse = await startAuthentication({ optionsJSON: options });
+
+      const verifyRes = await fetch("/api/auth/authenticate/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          authenticationResponse,
+          expectedChallenge: options.challenge,
+        }),
+      });
+      const result = await verifyRes.json();
+
+      if (result.verified) {
+        setStatus("✅ Logged in successfully!");
+      } else {
+        setStatus("❌ Authentication failed.");
+      }
+    } catch (err) {
+      setStatus(`❌ Error: ${err}`);
+    }
+  }
 
   return (
-    <main>
-      <section className="page-hero">
-        <h1>EMPLOYEE LOGIN</h1>
-        <p>Authorized personnel only</p>
-      </section>
-
-      <section className="login-section">
-        <div className="login-form-wrapper">
-          <div className="login-form">
-            {error && <p className="login-error">{error}</p>}
-            <div className="form-group">
-              <label htmlFor="email">EMAIL</label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">PASSWORD</label>
-              <input
-                type="password"
-                id="password"
-                placeholder="Your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <button className="btn-primary btn-dark" onClick={handleLogin}>
-              LOGIN
-            </button>
-          </div>
-        </div>
-      </section>
-    </main>
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <h1 className="text-2xl font-bold">Login with YubiKey</h1>
+      <input
+        type="email"
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="border p-2 rounded w-64"
+      />
+      <div className="flex gap-4">
+        <button
+          onClick={handleRegister}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Register YubiKey
+        </button>
+        <button
+          onClick={handleLogin}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Login with YubiKey
+        </button>
+      </div>
+      {status && <p className="mt-4">{status}</p>}
+    </div>
   );
 }
