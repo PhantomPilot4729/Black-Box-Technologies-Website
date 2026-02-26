@@ -10,11 +10,12 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Hardcoded employee credentials for now
-        const validEmail = "employee@blackboxtech.xyz";
-        const validPassword = "changeme123";
+        const validEmail = process.env.ADMIN_EMAIL;
+        const validPassword = process.env.ADMIN_PASSWORD;
 
         if (
+          validEmail &&
+          validPassword &&
           credentials?.email === validEmail &&
           credentials?.password === validPassword
         ) {
