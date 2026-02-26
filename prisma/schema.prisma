@@ -21,3 +21,42 @@ model Credential {
   counter      BigInt
   user         User    @relation(fields: [userId], references: [id])
 }
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  company   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  customerId  String
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  service     String
+  status      OrderStatus @default(PENDING)
+  description String?
+  price       Float?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model Document {
+  id         String   @id @default(cuid())
+  name       String
+  url        String
+  size       Int?
+  uploadedBy String?
+  createdAt  DateTime @default(now())
+}

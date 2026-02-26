@@ -3,6 +3,16 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Link from "next/link";
+
+const SECTIONS = [
+  { href: "/dashboard/orders", title: "ORDERS", desc: "View and manage customer service orders" },
+  { href: "/dashboard/customers", title: "CUSTOMERS", desc: "View and manage customer records" },
+  { href: "/dashboard/documents", title: "DOCUMENTS", desc: "Upload and access internal documents" },
+  { href: "/dashboard/content", title: "CONTENT EDITOR", desc: "Edit website content and updates" },
+  { href: "/dashboard/analytics", title: "ANALYTICS", desc: "View business and site statistics" },
+  { href: "/dashboard/settings", title: "ACCOUNT SETTINGS", desc: "Manage password and security keys" },
+];
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -33,21 +43,26 @@ export default function Dashboard() {
 
       <section className="dashboard-section">
         <div className="dashboard-grid">
-          <div className="dashboard-card">
-            <h3>DOCUMENTS</h3>
-            <p>Access internal documents and resources</p>
-          </div>
-          <div className="dashboard-card">
-            <h3>ORDERS</h3>
-            <p>Manage customer orders and requests</p>
-          </div>
-          <div className="dashboard-card">
-            <h3>CONTENT</h3>
-            <p>Edit website content and updates</p>
-          </div>
+          {SECTIONS.map((s) => (
+            <Link key={s.href} href={s.href}>
+              <div className="dashboard-card">
+                <h3>{s.title}</h3>
+                <p>{s.desc}</p>
+              </div>
+            </Link>
+          ))}
         </div>
         <button
-          className="btn-primary btn-dark"
+          className="btn-primary"
+          onClick={() => signOut({ callbackUrl: "/" })}
+        >
+          SIGN OUT
+        </button>
+      </section>
+    </main>
+  );
+}
+
           onClick={() => signOut({ callbackUrl: "/" })}
         >
           SIGN OUT
