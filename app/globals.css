@@ -479,7 +479,7 @@ main{
 
 .form-group input,
 .form-group textarea {
-  background: var(--background-secondary);
+  background: var(--background);
   border: 1px solid #00f5ff22;
   color: var(--text-primary);
   font-family: 'Source Code Pro', monospace;
