@@ -703,3 +703,37 @@ main{
 .blackwall-page {
   overflow: hidden;
 }
+
+.nav-blackwall {
+  position: relative;
+  color: var(--neon-red) !important;
+}
+
+.nav-blackwall:hover {
+  color: var(--neon-cyan) !important;
+  text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-red) !important;
+  animation: blackwallGlitch 0.3s steps(2) infinite !important;
+}
+
+@keyframes blackwallGlitch {
+  0% { 
+    transform: translateX(0); 
+    text-shadow: 0 0 8px var(--neon-cyan);
+  }
+  25% { 
+    transform: translateX(-2px); 
+    text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-cyan);
+  }
+  50% { 
+    transform: translateX(2px); 
+    text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-cyan);
+  }
+  75% { 
+    transform: translateX(-1px); 
+    text-shadow: 1px 0 var(--neon-cyan), -1px 0 var(--neon-red);
+  }
+  100% { 
+    transform: translateX(0); 
+    text-shadow: 0 0 8px var(--neon-red);
+  }
+}

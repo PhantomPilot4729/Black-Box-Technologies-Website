@@ -9,7 +9,7 @@ export default function Navbar() {
           <li><Link href="/about">About</Link></li>
           <li><Link href="/services">Services</Link></li>
           <li><Link href="/contact">Contact</Link></li>
-          <li><Link href="/dashboard/analytics?tab=blackwall">Blackwall Line</Link></li>
+          <li><Link href="/blackwall" className="nav-blackwall">BLACKWALL LINE</Link></li>
           <li><Link href="/login" className="nav-login">EMPLOYEE LOGIN</Link></li>
         </ul>
     </nav>
