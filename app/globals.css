@@ -710,9 +710,8 @@ main{
 }
 
 .nav-blackwall:hover {
-  color: var(--neon-cyan) !important;
   text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-red) !important;
-  animation: blackwallGlitch 0.3s steps(2) infinite !important;
+  animation: blackwallGlitch 0.4s linear infinite !important;
 }
 
 @keyframes blackwallGlitch {
