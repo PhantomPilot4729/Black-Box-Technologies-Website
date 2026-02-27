@@ -1,3 +1,11 @@
+model WebAuthnChallenge {
+  id        String   @id @default(cuid())
+  userId    String
+  challenge String
+  type      String   // 'registration' or 'authentication'
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
 datasource db {
   provider = "postgresql"
   url = env("DATABASE_URL")
@@ -14,6 +22,7 @@ model User {
   password    String
   role        Role         @default(EMPLOYEE)
   credentials Credential[]
+  webAuthnChallenges WebAuthnChallenge[]
 }
 
 enum Role {

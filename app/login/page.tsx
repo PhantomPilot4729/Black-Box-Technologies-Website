@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import {
-  startRegistration,
-  startAuthentication,
-} from "@simplewebauthn/browser";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -28,52 +25,108 @@ export default function LoginPage() {
     }
   }
 
+
   async function handleRegister() {
     try {
       setStatus("Starting YubiKey registration...");
-      const optionsRes = await fetch("/api/auth/register", {
+      // 1. Fetch registration challenge from server (POST, include user email)
+      const res = await fetch("/api/yubikey/register-challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ userId: email })
       });
-      const options = await optionsRes.json();
-      const registrationResponse = await startRegistration({ optionsJSON: options });
-      const verifyRes = await fetch("/api/auth/register/verify", {
+      if (!res.ok) throw new Error("Failed to get registration challenge");
+      const options = await res.json();
+      // 2. Convert binary fields from base64url to Uint8Array
+      options.challenge = Uint8Array.from(atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+      options.user.id = Uint8Array.from(atob(options.user.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+      if (options.excludeCredentials) {
+        options.excludeCredentials = options.excludeCredentials.map((cred: any) => ({
+          ...cred,
+          id: Uint8Array.from(atob(cred.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0))
+        }));
+      }
+      // 3. Call WebAuthn API
+      const cred = await navigator.credentials.create({ publicKey: options }) as PublicKeyCredential;
+      if (!cred) throw new Error("No credential returned");
+      const attestationResponse = cred.response as AuthenticatorAttestationResponse;
+      // 4. Prepare credential for server
+      const credentialJSON = {
+        id: cred.id,
+        type: cred.type,
+        rawId: btoa(String.fromCharCode(...new Uint8Array(cred.rawId))),
+        response: {
+          clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(attestationResponse.clientDataJSON))),
+          attestationObject: btoa(String.fromCharCode(...new Uint8Array(attestationResponse.attestationObject))),
+        }
+      };
+      // 5. Send credential to server for verification/storage
+      const storeRes = await fetch("/api/yubikey/register-complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, registrationResponse, expectedChallenge: options.challenge }),
+        body: JSON.stringify({ userId: email, credential: credentialJSON })
       });
-      const result = await verifyRes.json();
-      setStatus(result.verified ? "✅ YubiKey registered successfully!" : "❌ Registration failed.");
+      const storeData = await storeRes.json();
+      if (storeData.success) {
+        setStatus("✅ YubiKey/WebAuthn credential registered and stored!");
+      } else {
+        setStatus("Credential created but failed to store: " + (storeData.error || "Unknown error"));
+      }
     } catch (err) {
-      setStatus(`❌ Error: ${err}`);
+      setStatus(`❌ Error: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
   async function handleYubikeyLogin() {
     try {
       setStatus("Starting YubiKey authentication...");
-      const optionsRes = await fetch("/api/auth/authenticate", {
+      // 1. Fetch authentication challenge from server (POST, include user email)
+      const res = await fetch("/api/yubikey/authenticate-challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ userId: email })
       });
-      const options = await optionsRes.json();
-      const authenticationResponse = await startAuthentication({ optionsJSON: options });
-      const verifyRes = await fetch("/api/auth/authenticate/verify", {
+      if (!res.ok) throw new Error("Failed to get authentication challenge");
+      const options = await res.json();
+      // 2. Convert binary fields from base64url to Uint8Array
+      options.challenge = Uint8Array.from(atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
+      if (options.allowCredentials) {
+        options.allowCredentials = options.allowCredentials.map((cred: any) => ({
+          ...cred,
+          id: Uint8Array.from(atob(cred.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0))
+        }));
+      }
+      // 3. Call WebAuthn API
+      const assertion = await navigator.credentials.get({ publicKey: options }) as PublicKeyCredential;
+      if (!assertion) throw new Error("No assertion returned");
+      const assertionResponse = assertion.response as AuthenticatorAssertionResponse;
+      // 4. Prepare assertion for server
+      const assertionJSON = {
+        id: assertion.id,
+        type: assertion.type,
+        rawId: btoa(String.fromCharCode(...new Uint8Array(assertion.rawId))),
+        response: {
+          clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertionResponse.clientDataJSON))),
+          authenticatorData: btoa(String.fromCharCode(...new Uint8Array(assertionResponse.authenticatorData))),
+          signature: btoa(String.fromCharCode(...new Uint8Array(assertionResponse.signature))),
+          userHandle: assertionResponse.userHandle ? btoa(String.fromCharCode(...new Uint8Array(assertionResponse.userHandle))) : null,
+        }
+      };
+      // 5. Send assertion to server for verification
+      const verifyRes = await fetch("/api/yubikey/authenticate-complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, authenticationResponse, expectedChallenge: options.challenge }),
+        body: JSON.stringify({ userId: email, assertion: assertionJSON })
       });
-      const result = await verifyRes.json();
-      if (result.verified) {
+      const verifyData = await verifyRes.json();
+      if (verifyData.success) {
         setStatus("✅ Logged in successfully!");
         window.location.href = "/dashboard";
       } else {
-        setStatus("❌ Authentication failed.");
+        setStatus("❌ Authentication failed: " + (verifyData.error || "Unknown error"));
       }
     } catch (err) {
-      setStatus(`❌ Error: ${err}`);
+      setStatus(`❌ Error: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -150,6 +203,9 @@ export default function LoginPage() {
                 <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
                   <button className="btn-primary" onClick={handleYubikeyLogin}>
                     LOGIN
+                  </button>
+                  <button className="btn-secondary" onClick={handleRegister}>
+                    REGISTER YUBIKEY
                   </button>
                 </div>
               </div>
