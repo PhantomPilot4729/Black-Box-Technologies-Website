@@ -28,12 +28,22 @@ export default function ContentEditor() {
   }, [status, router]);
 
   // Handle kernel key submission
-  function handleKernelKey() {
-    if (kernelKey === "AFTERLIFE") {
-      setStep('editor');
-      setKernelError("");
-    } else {
-      setKernelError("Invalid kernel key password.");
+  async function handleKernelKey() {
+    setKernelError("");
+    try {
+      const res = await fetch("/api/kernelkey", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kernelKey }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setStep('editor');
+      } else {
+        setKernelError(data.error || "Invalid kernel key password.");
+      }
+    } catch (err) {
+      setKernelError("Server error. Please try again later.");
     }
   }
 
@@ -56,7 +66,20 @@ export default function ContentEditor() {
               value={kernelKey}
               onChange={e => setKernelKey(e.target.value)}
               placeholder="Enter kernel key password"
-              style={{ marginTop: 8, marginBottom: 8, width: "100%" }}
+              className="input-neon"
+              style={{
+                marginTop: 8,
+                marginBottom: 8,
+                width: "100%",
+                background: "#0a192f",
+                border: "2px solid var(--neon-cyan)",
+                color: "var(--neon-cyan)",
+                borderRadius: 6,
+                padding: "0.75rem 1rem",
+                fontSize: "1rem",
+                outline: "none",
+                boxShadow: "0 0 8px 0 var(--neon-cyan)"
+              }}
               onKeyDown={e => { if (e.key === 'Enter') handleKernelKey(); }}
             />
             <button className="btn-primary" style={{ width: "100%" }} onClick={handleKernelKey}>SUBMIT</button>
