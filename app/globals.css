@@ -18,6 +18,7 @@
   --hover-yellow: #ffe800;
   --neon-red: #ff003c;
   --hover-red: #cc0022;
+  --blackwall-red-transparent: #ff003c22;
   --text-primary: #c8e8f0;
   --text-secondary: #5a8fa8;
 }
@@ -712,6 +713,11 @@ main{
 .nav-blackwall:hover {
   text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-red) !important;
   animation: blackwallGlitch 0.8s linear infinite !important;
+}
+
+.nav-links a.nav-blackwall:hover {
+  color: unset !important;
+  text-shadow: none !important;
 }
 
 @keyframes blackwallGlitch {
