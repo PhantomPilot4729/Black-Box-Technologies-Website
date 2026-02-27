@@ -28,6 +28,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function AnalyticsPage() {
+    const [activeTab, setActiveTab] = useState<'analytics' | 'blackwall'>('analytics');
   const { status } = useSession();
   const router = useRouter();
   const [data, setData] = useState<Analytics | null>(null);
@@ -56,104 +57,147 @@ export default function AnalyticsPage() {
 
   return (
     <div style={{ marginTop: "2rem" }}>
-      <h2>SALES TREND</h2>
-      <div>
-        <Line
-          data={{
-            labels: salesTrend.labels,
-            datasets: [
-              {
-                label: "Sales ($)",
-                data: salesTrend.values,
-                borderColor: "var(--neon-cyan)",
-                backgroundColor: "rgba(0,255,136,0.15)",
-                pointBackgroundColor: "var(--neon-cyan)",
-                pointBorderColor: "#00ff88",
-                pointHoverBackgroundColor: "var(--neon-yellow)",
-                pointHoverBorderColor: "var(--neon-yellow)",
-                tension: 0.4,
-              },
-            ],
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+        <button
+          style={{
+            padding: '0.5rem 1.5rem',
+            background: activeTab === 'analytics' ? 'var(--neon-cyan)' : 'transparent',
+            color: activeTab === 'analytics' ? '#0a192f' : 'var(--neon-cyan)',
+            border: '1px solid var(--neon-cyan)',
+            fontWeight: 'bold',
+            fontFamily: 'Orbitron, Montserrat, sans-serif',
+            cursor: 'pointer',
+            borderRadius: '6px',
+            transition: 'background 0.2s, color 0.2s',
           }}
-          options={{
-            responsive: true,
-            plugins: {
-              legend: {
-                display: true,
-                labels: {
-                  color: "var(--neon-cyan)",
-                  font: {
-                    size: 14,
-                    family: "'Orbitron', 'Montserrat', 'sans-serif'",
-                    weight: "bold",
-                  },
-                },
-              },
-              title: {
-                display: true,
-                text: "Sales Trend (Completed Orders)",
-                color: "var(--neon-cyan)",
-                font: {
-                  size: 18,
-                  family: "'Orbitron', 'Montserrat', 'sans-serif'",
-                  weight: "bold",
-                },
-              },
-              tooltip: {
-                backgroundColor: "#0a192f",
-                titleColor: "var(--neon-cyan)",
-                bodyColor: "#00ff88",
-                borderColor: "var(--neon-cyan)",
-                borderWidth: 2,
-              },
-            },
-            scales: {
-              x: {
-                grid: {
-                  color: "rgba(0,255,136,0.15)",
-                },
-                ticks: {
-                  color: "var(--neon-cyan)",
-                  font: {
-                    size: 12,
-                    family: "'Orbitron', 'Montserrat', 'sans-serif'",
-                  },
-                },
-              },
-              y: {
-                grid: {
-                  color: "rgba(0,255,136,0.15)",
-                },
-                ticks: {
-                  color: "#00ff88",
-                  font: {
-                    size: 12,
-                    family: "'Orbitron', 'Montserrat', 'sans-serif'",
-                  },
-                },
-              },
-            },
+          onClick={() => setActiveTab('analytics')}
+        >
+          ANALYTICS
+        </button>
+        <button
+          style={{
+            padding: '0.5rem 1.5rem',
+            background: activeTab === 'blackwall' ? 'var(--neon-cyan)' : 'transparent',
+            color: activeTab === 'blackwall' ? '#0a192f' : 'var(--neon-cyan)',
+            border: '1px solid var(--neon-cyan)',
+            fontWeight: 'bold',
+            fontFamily: 'Orbitron, Montserrat, sans-serif',
+            cursor: 'pointer',
+            borderRadius: '6px',
+            transition: 'background 0.2s, color 0.2s',
           }}
-          height={300}
-        />
+          onClick={() => setActiveTab('blackwall')}
+        >
+          BLACKWALL LINE
+        </button>
       </div>
-      <h2>RECENT ORDERS</h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
-        {data && Array.isArray(data.recentOrders) && data.recentOrders.length === 0 && (
-          <p style={{ color: "var(--text-secondary)" }}>No orders yet.</p>
-        )}
-        {data && Array.isArray(data.recentOrders) && data.recentOrders.map((o: Analytics['recentOrders'][0]) => (
-          <div key={o.id} className="dashboard-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <p style={{ marginBottom: "0.1rem", fontWeight: "bold" }}>{o.service}</p>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: 0 }}>{o.customer.name} · {new Date(o.createdAt).toLocaleDateString()}</p>
-            </div>
-            <span style={{ color: STATUS_COLORS[o.status], border: `1px solid ${STATUS_COLORS[o.status]}`, padding: "0.2rem 0.6rem", fontSize: "0.75rem" }}>
-              {o.status.replace("_", " ")}
-            </span>
+      {activeTab === 'analytics' ? (
+        <>
+          <h2>SALES TREND</h2>
+          <div>
+            <Line
+              data={{
+                labels: salesTrend.labels,
+                datasets: [
+                  {
+                    label: "Sales ($)",
+                    data: salesTrend.values,
+                    borderColor: "var(--neon-cyan)",
+                    backgroundColor: "rgba(0,255,136,0.15)",
+                    pointBackgroundColor: "var(--neon-cyan)",
+                    pointBorderColor: "#00ff88",
+                    pointHoverBackgroundColor: "var(--neon-yellow)",
+                    pointHoverBorderColor: "var(--neon-yellow)",
+                    tension: 0.4,
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: true,
+                    labels: {
+                      color: "var(--neon-cyan)",
+                      font: {
+                        size: 14,
+                        family: "'Orbitron', 'Montserrat', 'sans-serif'",
+                        weight: "bold",
+                      },
+                    },
+                  },
+                  title: {
+                    display: true,
+                    text: "Sales Trend (Completed Orders)",
+                    color: "var(--neon-cyan)",
+                    font: {
+                      size: 18,
+                      family: "'Orbitron', 'Montserrat', 'sans-serif'",
+                      weight: "bold",
+                    },
+                  },
+                  tooltip: {
+                    backgroundColor: "#0a192f",
+                    titleColor: "var(--neon-cyan)",
+                    bodyColor: "#00ff88",
+                    borderColor: "var(--neon-cyan)",
+                    borderWidth: 2,
+                  },
+                },
+                scales: {
+                  x: {
+                    grid: {
+                      color: "rgba(0,255,136,0.15)",
+                    },
+                    ticks: {
+                      color: "var(--neon-cyan)",
+                      font: {
+                        size: 12,
+                        family: "'Orbitron', 'Montserrat', 'sans-serif'",
+                      },
+                    },
+                  },
+                  y: {
+                    grid: {
+                      color: "rgba(0,255,136,0.15)",
+                    },
+                    ticks: {
+                      color: "#00ff88",
+                      font: {
+                        size: 12,
+                        family: "'Orbitron', 'Montserrat', 'sans-serif'",
+                      },
+                    },
+                  },
+                },
+              }}
+              height={300}
+            />
           </div>
-        ))}
-      </div>
+          <h2>RECENT ORDERS</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1rem" }}>
+            {data && Array.isArray(data.recentOrders) && data.recentOrders.length === 0 && (
+              <p style={{ color: "var(--text-secondary)" }}>No orders yet.</p>
+            )}
+            {data && Array.isArray(data.recentOrders) && data.recentOrders.map((o: Analytics['recentOrders'][0]) => (
+              <div key={o.id} className="dashboard-card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <p style={{ marginBottom: "0.1rem", fontWeight: "bold" }}>{o.service}</p>
+                  <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginBottom: 0 }}>{o.customer.name} · {new Date(o.createdAt).toLocaleDateString()}</p>
+                </div>
+                <span style={{ color: STATUS_COLORS[o.status], border: `1px solid ${STATUS_COLORS[o.status]}`, padding: "0.2rem 0.6rem", fontSize: "0.75rem" }}>
+                  {o.status.replace("_", " ")}
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--neon-cyan)', fontFamily: 'Orbitron, Montserrat, sans-serif' }}>
+          <h2>BLACKWALL LINE</h2>
+          <p style={{ fontSize: '1.2rem', marginTop: '1rem' }}>🚧 Under Construction 🚧</p>
+        </div>
+      )}
     </div>
   );
 }
