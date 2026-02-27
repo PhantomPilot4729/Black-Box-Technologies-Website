@@ -103,7 +103,6 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
-        </div>
 
         <div className="dashboard-card" style={{ marginTop: "1.5rem" }}>
           <h3>CHANGE PASSWORD</h3>
