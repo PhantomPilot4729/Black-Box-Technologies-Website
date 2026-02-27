@@ -711,7 +711,7 @@ main{
 
 .nav-blackwall:hover {
   text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-red) !important;
-  animation: blackwallGlitch 0.4s linear infinite !important;
+  animation: blackwallGlitch 0.8s linear infinite !important;
 }
 
 @keyframes blackwallGlitch {
@@ -720,25 +720,53 @@ main{
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
   }
-  20% { 
+  10% { 
     transform: translateX(-3px);
     color: var(--neon-cyan);
-    text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-cyan);
+    text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-red);
   }
-  40% { 
+  11% { 
     transform: translateX(3px);
     color: var(--neon-red);
-    text-shadow: -2px 0 var(--neon-cyan), 2px 0 var(--neon-red);
   }
-  60% {
-    transform: translateX(-1px);
+  30% { 
+    transform: translateX(2px);
     color: var(--neon-cyan);
-    text-shadow: 0 0 8px var(--neon-cyan);
+    text-shadow: -2px 0 var(--neon-cyan);
   }
-  80% {
-    transform: translateX(1px);
+  31% {
+    color: var(--neon-red);
+    transform: translateX(-2px);
+  }
+  45% {
+    transform: translateX(0);
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
+  }
+  60% { 
+    transform: translateX(-1px);
+    color: var(--neon-cyan);
+    text-shadow: 1px 0 var(--neon-red), -1px 0 var(--neon-cyan);
+  }
+  61% {
+    color: var(--neon-red);
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-3px);
+    color: var(--neon-cyan);
+    text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-red);
+  }
+  76% {
+    color: var(--neon-red);
+    transform: translateX(0);
+  }
+  90% {
+    transform: translateX(2px);
+    color: var(--neon-cyan);
+  }
+  91% {
+    color: var(--neon-red);
   }
   100% { 
     transform: translateX(0);
