@@ -1,6 +1,12 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+
+// Define tier arrays for permissions
+const EXECUTIVE_TIERS = ["EXECUTIVE"];
+const MANAGEMENT_TIERS = ["EXECUTIVE", "MANAGEMENT"];
+const EMPLOYEE_TIERS = ["EXECUTIVE", "MANAGEMENT", "EMPLOYEE"];
 
 const handler = NextAuth({
   providers: [
@@ -15,15 +21,14 @@ const handler = NextAuth({
         // Find user in database
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-          select: { id: true, email: true, role: true },
+          select: { id: true, email: true, role: true, password: true },
         });
-        if (!user) return null;
-        // For now, compare password to env var (later: store hashed passwords)
-        const validPassword = process.env.ADMIN_PASSWORD;
-        if (credentials.password === validPassword) {
-          return { id: user.id, email: user.email, role: user.role };
-        }
-        return null;
+        if (!user || !user.password) return null;
+        // Check password using bcryptjs
+        const valid = await bcrypt.compare(credentials.password, user.password);
+        if (!valid) return null;
+        // Return user with role
+        return { id: user.id, email: user.email, role: user.role };
       },
     }),
   ],
