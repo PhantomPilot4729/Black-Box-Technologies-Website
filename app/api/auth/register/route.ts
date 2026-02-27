@@ -1,6 +1,7 @@
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import bcrypt from "bcryptjs";
 
 const RP_NAME = "Black Box Technologies";
 const RP_ID = "blackboxdatadestruction.xyz";
@@ -10,8 +11,10 @@ export async function POST(req: Request) {
 
   let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    // WebAuthn-only users get a random password (not used for login)
-    user = await prisma.user.create({ data: { email, password: Math.random().toString(36).slice(2) } });
+    // WebAuthn-only users get a random password (not used for login), but hash it for bcrypt compatibility
+    const randomPassword = Math.random().toString(36).slice(2);
+    const hashed = await bcrypt.hash(randomPassword, 10);
+    user = await prisma.user.create({ data: { email, password: hashed } });
   }
 
   const options = await generateRegistrationOptions({
