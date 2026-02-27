@@ -1,3 +1,35 @@
+export async function POST(request: Request) {
+  const { userId } = await request.json();
+  if (!userId) {
+    return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+  }
+  // Fetch user from DB
+  let user = await prisma.user.findUnique({ where: { email: userId } });
+  if (!user) {
+    // Optionally create user or return error
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+  // Generate registration options
+  const options = await generateRegistrationOptions({
+    rpName: "Black Box Technologies",
+    rpID: process.env.WEBAUTHN_RPID || "localhost",
+    userID: Buffer.from(user.id, 'utf-8'),
+    userName: user.email || user.id,
+    userDisplayName: user.name || user.email || user.id,
+    attestationType: "direct",
+    authenticatorSelection: { userVerification: "preferred" },
+    timeout: 60000,
+  });
+  // Store challenge in DB
+  await prisma.webAuthnChallenge.create({
+    data: {
+      userId: user.id,
+      challenge: options.challenge,
+      type: "registration",
+    },
+  });
+  return NextResponse.json(options);
+}
 import { NextResponse } from "next/server";
 import { generateRegistrationOptions } from "@/lib/webauthn";
 import { prisma } from "@/lib/prisma";
