@@ -723,59 +723,60 @@ main{
   0% { 
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
-    transform: translateX(0);
+    transform: translateX(0) translateY(0);
   }
   10% { 
     color: var(--neon-cyan);
     text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-red);
-    transform: translateX(-3px);
+    transform: translateX(-3px) translateY(2px);
   }
   11% { 
     color: var(--neon-red);
-    transform: translateX(3px);
+    transform: translateX(3px) translateY(-2px);
   }
   30% { 
     color: var(--neon-cyan);
     text-shadow: -2px 0 var(--neon-cyan);
-    transform: translateX(2px);
+    transform: translateX(2px) translateY(1px);
   }
   31% {
     color: var(--neon-red);
-    transform: translateX(-2px);
+    transform: translateX(-2px) translateY(-1px);
   }
   45% {
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
-    transform: translateX(0);
+    transform: translateX(0) translateY(0);
   }
   60% { 
     color: var(--neon-cyan);
     text-shadow: 1px 0 var(--neon-red), -1px 0 var(--neon-cyan);
-    transform: translateX(-1px);
+    transform: translateX(-1px) translateY(2px);
   }
   61% {
     color: var(--neon-red);
-    transform: translateX(3px);
+    transform: translateX(3px) translateY(-2px);
   }
   75% {
     color: var(--neon-cyan);
     text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-red);
-    transform: translateX(-3px);
+    transform: translateX(-3px) translateY(1px);
   }
   76% {
     color: var(--neon-red);
-    transform: translateX(0);
+    transform: translateX(0) translateY(0);
   }
   90% {
     color: var(--neon-cyan);
-    transform: translateX(2px);
+    transform: translateX(2px) translateY(-1px);
   }
   91% {
     color: var(--neon-red);
+    transform: translateX(0) translateY(0);
   }
   100% { 
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
-    transform: translateX(0);
+    transform: translateX(0) translateY(0);
   }
 }
