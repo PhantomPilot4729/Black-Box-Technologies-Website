@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
-import * as bcrypt from "@node-rs/bcrypt";
+import bcrypt from "bcryptjs";
 
 // Define tier arrays for permissions
 const EXECUTIVE_TIERS = ["EXECUTIVE"];
@@ -24,7 +24,7 @@ const handler = NextAuth({
           select: { id: true, email: true, role: true, password: true },
         });
         if (!user || !user.password) return null;
-        // Check password using @node-rs/bcrypt
+        // Check password using bcryptjs
         const valid = await bcrypt.compare(credentials.password, user.password);
         if (!valid) return null;
         // Return user with role
