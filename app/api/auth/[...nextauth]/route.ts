@@ -33,7 +33,9 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async session({ session, token }) {
-      if (token?.role) session.user.role = token.role;
+      if (token?.role && session.user) {
+        session.user.role = token.role;
+      }
       return session;
     },
     async jwt({ token, user }) {
