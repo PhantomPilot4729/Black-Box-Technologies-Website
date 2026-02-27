@@ -39,7 +39,9 @@ const handler = NextAuth({
       return session;
     },
     async jwt({ token, user }) {
-      if (user?.role) token.role = user.role;
+      if (user && typeof user === "object" && "role" in user && typeof user.role === "string") {
+        token.role = user.role;
+      }
       return token;
     },
   },
