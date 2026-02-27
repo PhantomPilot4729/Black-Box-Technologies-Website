@@ -11,7 +11,8 @@ export default function SettingsPage() {
   const router = useRouter();
   const [status2, setStatus2] = useState("");
   const [passwordForm, setPasswordForm] = useState({ current: "", newPass: "", confirm: "" });
-  const [yubikeys, setYubikeys] = useState([]);
+  type Credential = { credentialId: string };
+  const [yubikeys, setYubikeys] = useState<Credential[]>([]);
   const [loadingYubikeys, setLoadingYubikeys] = useState(false);
 
   useEffect(() => {
