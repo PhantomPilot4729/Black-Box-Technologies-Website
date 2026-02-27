@@ -710,72 +710,72 @@ main{
   color: var(--neon-red) !important;
 }
 
-.nav-blackwall:hover {
-  text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-red) !important;
-  animation: blackwallGlitch 0.8s linear infinite !important;
+.nav-blackwall {
+  position: relative;
+  color: var(--neon-red) !important;
 }
 
-.nav-links a:hover {
-  text-shadow: 0 0 8px var(--neon-cyan);
+.nav-blackwall:hover {
+  animation: blackwallGlitch 0.8s linear infinite;
 }
 
 @keyframes blackwallGlitch {
   0% { 
-    transform: translateX(0);
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
+    transform: translateX(0);
   }
   10% { 
-    transform: translateX(-3px);
     color: var(--neon-cyan);
     text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-red);
+    transform: translateX(-3px);
   }
   11% { 
-    transform: translateX(3px);
     color: var(--neon-red);
+    transform: translateX(3px);
   }
   30% { 
-    transform: translateX(2px);
     color: var(--neon-cyan);
     text-shadow: -2px 0 var(--neon-cyan);
+    transform: translateX(2px);
   }
   31% {
     color: var(--neon-red);
     transform: translateX(-2px);
   }
   45% {
-    transform: translateX(0);
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
+    transform: translateX(0);
   }
   60% { 
-    transform: translateX(-1px);
     color: var(--neon-cyan);
     text-shadow: 1px 0 var(--neon-red), -1px 0 var(--neon-cyan);
+    transform: translateX(-1px);
   }
   61% {
     color: var(--neon-red);
     transform: translateX(3px);
   }
   75% {
-    transform: translateX(-3px);
     color: var(--neon-cyan);
     text-shadow: 2px 0 var(--neon-cyan), -2px 0 var(--neon-red);
+    transform: translateX(-3px);
   }
   76% {
     color: var(--neon-red);
     transform: translateX(0);
   }
   90% {
-    transform: translateX(2px);
     color: var(--neon-cyan);
+    transform: translateX(2px);
   }
   91% {
     color: var(--neon-red);
   }
   100% { 
-    transform: translateX(0);
     color: var(--neon-red);
     text-shadow: 0 0 8px var(--neon-red);
+    transform: translateX(0);
   }
 }
