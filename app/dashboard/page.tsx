@@ -29,11 +29,24 @@ export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
+    useEffect(() => {
+      if (status === "unauthenticated") {
+        router.push("/login");
+        return;
+      }
+      if (session?.user?.role === "EXECUTIVE") {
+        router.replace("/dashboard/executive");
+        return;
+      }
+      if (session?.user?.role === "MANAGEMENT") {
+        router.replace("/dashboard/management");
+        return;
+      }
+      if (session?.user?.role === "EMPLOYEE") {
+        router.replace("/dashboard/employee");
+        return;
+      }
+    }, [status, session, router]);
 
   if (status === "loading") {
     return (
@@ -45,19 +58,7 @@ export default function Dashboard() {
     );
   }
 
-  // Redirect to tier dashboard
-  if (session?.user?.role === "EXECUTIVE") {
-    router.replace("/dashboard/executive");
-    return null;
-  }
-  if (session?.user?.role === "MANAGEMENT") {
-    router.replace("/dashboard/management");
-    return null;
-  }
-  if (session?.user?.role === "EMPLOYEE") {
-    router.replace("/dashboard/employee");
-    return null;
-  }
+    // ...existing code...
 
   // Determine sections by role
   let sections = EMP_SECTIONS;
