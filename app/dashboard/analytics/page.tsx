@@ -1,7 +1,8 @@
+"use client";
+
 import { Line } from "react-chartjs-2";
 import { Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
-"use client";
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
