@@ -13,7 +13,10 @@ const handler = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
         // Find user in database
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+          select: { id: true, email: true, role: true },
+        });
         if (!user) return null;
         // For now, compare password to env var (later: store hashed passwords)
         const validPassword = process.env.ADMIN_PASSWORD;
