@@ -11,7 +11,21 @@ export default function SettingsPage() {
   const router = useRouter();
   const [status2, setStatus2] = useState("");
   const [passwordForm, setPasswordForm] = useState({ current: "", newPass: "", confirm: "" });
+  const [yubikeys, setYubikeys] = useState([]);
+  const [loadingYubikeys, setLoadingYubikeys] = useState(false);
 
+  useEffect(() => {
+    if (session?.user?.email) {
+      setLoadingYubikeys(true);
+      fetch(`/api/auth/credentials?email=${encodeURIComponent(session.user.email)}`)
+        .then(res => res.json())
+        .then(data => {
+          setYubikeys(data.credentials || []);
+          setLoadingYubikeys(false);
+        })
+        .catch(() => setLoadingYubikeys(false));
+    }
+  }, [session?.user?.email]);
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
   }, [status, router]);
@@ -72,6 +86,23 @@ export default function SettingsPage() {
           <button className="btn-primary" onClick={handleRegisterYubikey}>
             REGISTER NEW YUBIKEY
           </button>
+          <div style={{ marginTop: "1rem" }}>
+            <strong>Registered YubiKeys:</strong>
+            {loadingYubikeys ? (
+              <p>Loading...</p>
+            ) : yubikeys.length === 0 ? (
+              <p style={{ color: "var(--text-secondary)" }}>No YubiKeys registered.</p>
+            ) : (
+              <ul style={{ marginTop: "0.5rem" }}>
+                {yubikeys.map((cred) => (
+                  <li key={cred.credentialId} style={{ color: "var(--neon-cyan)" }}>
+                    YubiKey ID: {cred.credentialId}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
         </div>
 
         <div className="dashboard-card" style={{ marginTop: "1.5rem" }}>
