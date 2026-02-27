@@ -12,9 +12,13 @@ const PAGES = [
   { name: "CONTACT", path: "/contact", file: "app/contact/page.tsx" },
 ];
 
-export default function ContentPage() {
   const { status } = useSession();
   const router = useRouter();
+  const [step, setStep] = useState<'kernel' | 'editor'>('kernel');
+  const [kernelKey, setKernelKey] = useState('');
+  const [kernelError, setKernelError] = useState('');
+  const [yubiEnabled, setYubiEnabled] = useState(false);
+  const [yubiStatus, setYubiStatus] = useState('');
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -22,6 +26,45 @@ export default function ContentPage() {
 
   if (status === "loading") return <main><section className="page-hero"><h1>LOADING...</h1></section></main>;
 
+  // Step 1: Kernel Key prompt
+  if (step === 'kernel') {
+    return (
+      <main>
+        <section className="page-hero">
+          <h1>INSERT KERNEL KEY</h1>
+          <p>Access to the content editor requires a KERNEL KEY.</p>
+        </section>
+        <section className="dashboard-section">
+          <Link href="/dashboard" className="btn-secondary">← BACK</Link>
+          <div className="dashboard-card" style={{ marginTop: "2rem", maxWidth: 400 }}>
+            <label style={{ fontWeight: 600, color: "var(--neon-cyan)" }}>KERNEL KEY PASSWORD</label>
+            <input
+              type="password"
+              value={kernelKey}
+              onChange={e => setKernelKey(e.target.value)}
+              placeholder="Enter kernel key password"
+              style={{ marginTop: 8, marginBottom: 8, width: "100%" }}
+              onKeyDown={e => { if (e.key === 'Enter') handleKernelKey(); }}
+            />
+            <button className="btn-primary" style={{ width: "100%" }} onClick={handleKernelKey}>SUBMIT</button>
+            {kernelError && <p style={{ color: "var(--neon-red)", marginTop: 8 }}>{kernelError}</p>}
+            {yubiEnabled && (
+              <div style={{ marginTop: 16 }}>
+                <label style={{ fontWeight: 600, color: "var(--neon-cyan)" }}>YUBIKEY (coming soon)</label>
+                <button className="btn-secondary" style={{ width: "100%", marginTop: 8 }} disabled>
+                  REGISTER/USE YUBIKEY
+                </button>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>YubiKey setup is only available after entering the kernel key password.</p>
+                {yubiStatus && <p style={{ color: "var(--neon-cyan)", marginTop: 8 }}>{yubiStatus}</p>}
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  // Step 2: Content Editor
   return (
     <main>
       <section className="page-hero">
@@ -76,4 +119,14 @@ export default function ContentPage() {
       </section>
     </main>
   );
+
+  function handleKernelKey() {
+    if (kernelKey === "AFTERLIFE") {
+      setStep('editor');
+      setKernelError('');
+      setYubiEnabled(true);
+    } else {
+      setKernelError("Invalid kernel key password.");
+    }
+  }
 }
