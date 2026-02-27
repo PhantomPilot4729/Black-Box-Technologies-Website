@@ -33,7 +33,7 @@ const handler = NextAuth({
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async session({ session, token }) {
-      if (token?.role && session.user) {
+      if (typeof token?.role === "string" && session.user) {
         session.user.role = token.role;
       }
       return session;
