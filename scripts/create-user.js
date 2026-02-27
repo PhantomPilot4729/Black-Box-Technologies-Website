@@ -1,7 +1,13 @@
 const { PrismaClient } = require("@prisma/client");
+const { PrismaNeon } = require("@prisma/adapter-neon");
 const bcrypt = require("bcryptjs");
 
-const prisma = new PrismaClient();
+function createPrismaClient() {
+  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+  return new PrismaClient({ adapter });
+}
+
+const prisma = createPrismaClient();
 
 async function main() {
   const email = process.argv[2];
