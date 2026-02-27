@@ -21,114 +21,125 @@ export default function Blackwall() {
     let frame = 0;
     let animId: number;
 
-    // Data stream particles
-    const streams: { x: number; y: number; speed: number; length: number; color: string; opacity: number }[] = [];
-    for (let i = 0; i < 80; i++) {
-      streams.push({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        speed: Math.random() * 4 + 2,
-        length: Math.random() * 80 + 20,
-        color: Math.random() > 0.5 ? "#ff003c" : "#00f5ff",
-        opacity: Math.random() * 0.8 + 0.2,
-      });
-    }
+    // Horizontal glitch lines
+    const glitchLines: { y: number; w: number; x: number; color: string; life: number; height: number }[] = [];
 
-    // Glitch blocks
-    const glitchBlocks: { x: number; y: number; w: number; h: number; color: string; life: number }[] = [];
+    const spawnGlitchLines = () => {
+      for (let i = 0; i < 6; i++) {
+        glitchLines.push({
+          y: Math.random() * H,
+          w: Math.random() * W * 0.8 + W * 0.1,
+          x: Math.random() * W * 0.2,
+          color: Math.random() > 0.5 ? "#ff003c" : "#00f5ff",
+          life: Math.random() * 6 + 3,
+          height: Math.random() * 3 + 1,
+        });
+      }
+    };
 
-    const spawnGlitch = () => {
-      for (let i = 0; i < 8; i++) {
-        glitchBlocks.push({
+    // Data corruption blocks
+    const corruptBlocks: { x: number; y: number; w: number; h: number; color: string; life: number; alpha: number }[] = [];
+
+    const spawnCorruptBlocks = () => {
+      for (let i = 0; i < 12; i++) {
+        corruptBlocks.push({
           x: Math.random() * W,
           y: Math.random() * H,
-          w: Math.random() * 200 + 20,
-          h: Math.random() * 8 + 2,
+          w: Math.random() * 120 + 10,
+          h: Math.random() * 4 + 1,
           color: Math.random() > 0.5 ? "#ff003c" : "#00f5ff",
-          life: Math.random() * 10 + 5,
+          life: Math.random() * 8 + 4,
+          alpha: Math.random() * 0.7 + 0.3,
         });
       }
     };
 
-    // Geometric rings
-    const rings: { x: number; y: number; radius: number; maxRadius: number; color: string; opacity: number }[] = [];
-    const spawnRings = () => {
-      for (let i = 0; i < 5; i++) {
-        rings.push({
-          x: W / 2,
-          y: H / 2,
-          radius: i * 80,
-          maxRadius: W,
-          color: i % 2 === 0 ? "#00f5ff" : "#ff003c",
-          opacity: 1,
-        });
-      }
-    };
+    // Central radial burst
+    let burstRadius = 0;
+    let burstOpacity = 0;
+    let burstStarted = false;
 
     const draw = () => {
-      // Phase 1: noise (0-60 frames)
-      // Phase 2: streams (60-150 frames)
-      // Phase 3: rings (150-240 frames)
-      // Phase 4: collapse (240-300 frames)
+      // Total animation: ~180 frames (3 seconds at 60fps)
+      // Phase 1 (0-20): white flash
+      // Phase 2 (20-120): glitch lines + corrupt blocks
+      // Phase 3 (80-150): radial burst
+      // Phase 4 (150-180): fade out
 
-      ctx.fillStyle = `rgba(0, 0, 0, ${frame < 60 ? 0.3 : 0.15})`;
+      // Clear with dark trail
+      ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
       ctx.fillRect(0, 0, W, H);
 
-      // Phase 1 - Digital noise
-      if (frame < 100) {
-        if (frame % 3 === 0) spawnGlitch();
-        glitchBlocks.forEach((block, i) => {
-          ctx.globalAlpha = block.life / 15;
+      // Phase 1 - Initial flash
+      if (frame < 20) {
+        const flashAlpha = frame < 10
+          ? frame / 10
+          : 1 - (frame - 10) / 10;
+        ctx.globalAlpha = flashAlpha * 0.9;
+        ctx.fillStyle = "#00f5ff";
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalAlpha = 1;
+      }
+
+      // Phase 2 - Glitch lines
+      if (frame >= 15 && frame < 140) {
+        if (frame % 4 === 0) spawnGlitchLines();
+        if (frame % 6 === 0) spawnCorruptBlocks();
+
+        glitchLines.forEach((line, i) => {
+          ctx.globalAlpha = (line.life / 9) * 0.9;
+          ctx.fillStyle = line.color;
+          ctx.fillRect(line.x, line.y, line.w, line.height);
+          line.life--;
+          if (line.life <= 0) glitchLines.splice(i, 1);
+        });
+
+        corruptBlocks.forEach((block, i) => {
+          ctx.globalAlpha = block.alpha * (block.life / 12);
           ctx.fillStyle = block.color;
           ctx.fillRect(block.x, block.y, block.w, block.h);
           block.life--;
-          if (block.life <= 0) glitchBlocks.splice(i, 1);
+          if (block.life <= 0) corruptBlocks.splice(i, 1);
         });
       }
 
-      // Phase 2 - Data streams
-      if (frame >= 60 && frame < 200) {
-        ctx.globalAlpha = Math.min((frame - 60) / 40, 1);
-        streams.forEach((s) => {
-          ctx.strokeStyle = s.color;
-          ctx.lineWidth = 1;
-          ctx.globalAlpha = s.opacity * Math.min((frame - 60) / 40, 1);
-          ctx.beginPath();
-          ctx.moveTo(s.x, s.y);
-          ctx.lineTo(s.x, s.y + s.length);
-          ctx.stroke();
-          s.y += s.speed;
-          if (s.y > H) s.y = -s.length;
-        });
+      // Phase 3 - Radial burst from center
+      if (frame === 80) {
+        burstStarted = true;
+        burstOpacity = 1;
+      }
+      if (burstStarted && frame < 160) {
+        burstRadius += 15;
+        burstOpacity -= 0.02;
+
+        // Outer ring - red
+        ctx.globalAlpha = Math.max(burstOpacity, 0);
+        ctx.strokeStyle = "#ff003c";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(W / 2, H / 2, burstRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Inner ring - cyan (slightly behind)
+        ctx.strokeStyle = "#00f5ff";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(W / 2, H / 2, burstRadius * 0.7, 0, Math.PI * 2);
+        ctx.stroke();
       }
 
-      // Phase 3 - Geometric rings
-      if (frame === 150) spawnRings();
-      if (frame >= 150 && frame < 260) {
-        rings.forEach((ring) => {
-          ctx.globalAlpha = ring.opacity;
-          ctx.strokeStyle = ring.color;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(ring.x, ring.y, ring.radius, 0, Math.PI * 2);
-          ctx.stroke();
-          ring.radius += 6;
-          ring.opacity -= 0.008;
-        });
-      }
-
-      // Phase 4 - Collapse/flash
-      if (frame >= 260 && frame < 300) {
-        const progress = (frame - 260) / 40;
-        ctx.globalAlpha = 1 - progress;
-        ctx.fillStyle = frame % 4 === 0 ? "#ff003c" : "#00f5ff";
+      // Phase 4 - Fade out
+      if (frame >= 150) {
+        const fadeProgress = (frame - 150) / 30;
+        ctx.globalAlpha = fadeProgress;
+        ctx.fillStyle = "#000000";
         ctx.fillRect(0, 0, W, H);
       }
 
       ctx.globalAlpha = 1;
       frame++;
 
-      if (frame < 300) {
+      if (frame < 180) {
         animId = requestAnimationFrame(draw);
       } else {
         setIntroComplete(true);
@@ -136,7 +147,6 @@ export default function Blackwall() {
     };
 
     animId = requestAnimationFrame(draw);
-
     return () => cancelAnimationFrame(animId);
   }, []);
 

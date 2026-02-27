@@ -717,23 +717,30 @@ main{
 
 @keyframes blackwallGlitch {
   0% { 
-    transform: translateX(0); 
-    text-shadow: 0 0 8px var(--neon-cyan);
+    transform: translateX(0);
+    text-shadow: 0 0 8px var(--neon-red);
   }
-  25% { 
-    transform: translateX(-2px); 
+  20% { 
+    transform: translateX(-3px);
     text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-cyan);
+    clip-path: inset(10% 0 80% 0);
   }
-  50% { 
-    transform: translateX(2px); 
-    text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-cyan);
+  40% { 
+    transform: translateX(3px);
+    text-shadow: -2px 0 var(--neon-cyan), 2px 0 var(--neon-red);
+    clip-path: inset(60% 0 20% 0);
   }
-  75% { 
-    transform: translateX(-1px); 
-    text-shadow: 1px 0 var(--neon-cyan), -1px 0 var(--neon-red);
+  60% {
+    transform: translateX(-1px);
+    clip-path: inset(30% 0 50% 0);
+  }
+  80% {
+    transform: translateX(1px);
+    clip-path: inset(0);
   }
   100% { 
-    transform: translateX(0); 
+    transform: translateX(0);
     text-shadow: 0 0 8px var(--neon-red);
+    clip-path: inset(0);
   }
 }
