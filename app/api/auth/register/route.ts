@@ -10,7 +10,8 @@ export async function POST(req: Request) {
 
   let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    user = await prisma.user.create({ data: { email } });
+    // WebAuthn-only users get a random password (not used for login)
+    user = await prisma.user.create({ data: { email, password: Math.random().toString(36).slice(2) } });
   }
 
   const options = await generateRegistrationOptions({
