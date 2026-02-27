@@ -715,9 +715,8 @@ main{
   animation: blackwallGlitch 0.8s linear infinite !important;
 }
 
-.nav-links a.nav-blackwall:hover {
-  color: unset !important;
-  text-shadow: none !important;
+.nav-links a:hover {
+  text-shadow: 0 0 8px var(--neon-cyan);
 }
 
 @keyframes blackwallGlitch {
