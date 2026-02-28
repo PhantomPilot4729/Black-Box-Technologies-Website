@@ -167,6 +167,7 @@ export default function Blackwall() {
         />
       )}
       <main className="blackwall-page">
+        <div className="blackwall-border-overlay" />
         <section className="page-hero blackwall-hero">
           <h1>BLACKWALL LINE</h1>
           <p>UNDER CONSTRUCTION</p>
