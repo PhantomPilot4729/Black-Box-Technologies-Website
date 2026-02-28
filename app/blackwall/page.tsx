@@ -114,14 +114,14 @@ export default function Blackwall() {
 
         // Outer ring - red
         ctx.globalAlpha = Math.max(burstOpacity, 0);
-        ctx.strokeStyle = "#ff003c";
+        ctx.strokeStyle = "var(--neon-red)";
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(W / 2, H / 2, burstRadius, 0, Math.PI * 2);
         ctx.stroke();
 
         // Inner ring - cyan (slightly behind)
-        ctx.strokeStyle = "#00f5ff";
+        ctx.strokeStyle = "var(--neon-cyan)";
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.arc(W / 2, H / 2, burstRadius * 0.7, 0, Math.PI * 2);
@@ -132,7 +132,7 @@ export default function Blackwall() {
       if (frame >= 150) {
         const fadeProgress = (frame - 150) / 30;
         ctx.globalAlpha = fadeProgress;
-        ctx.fillStyle = "#000000";
+        ctx.fillStyle = "var(--background)";
         ctx.fillRect(0, 0, W, H);
       }
 
@@ -168,8 +168,24 @@ export default function Blackwall() {
       )}
       <main className="blackwall-page">
         <section className="page-hero blackwall-hero">
-          <h1>BLACKWALL</h1>
+          <h1>BLACKWALL LINE</h1>
           <p>UNDER CONSTRUCTION</p>
+        </section>
+        <section className="blackwall-grid-section">
+            <div className="blackwall-grid">
+                <div className="blackwall-grid-card">
+                    <h3>Title Here</h3>
+                    <p>Description here</p>
+                </div>
+                <div className="blackwall-grid-card">
+                    <h3>Title Here</h3>
+                    <p>Description here</p>
+                </div>
+                <div className="blackwall-grid-card">
+                    <h3>Title Here</h3>
+                    <p>Description here</p>
+                </div>
+            </div>
         </section>
       </main>
     </>
