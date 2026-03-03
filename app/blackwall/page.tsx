@@ -198,45 +198,46 @@ export default function Blackwall() {
     const cardLines: { x: number; y: number; w: number; h: number; color: string; alpha: number }[] = [];
 
     const spawnCardEffects = () => {
-      if (!hoveredCard.current) return;
-      const rect = hoveredCard.current.getBoundingClientRect();
+  if (!hoveredCard.current) return;
+  const rect = hoveredCard.current.getBoundingClientRect();
+  const totalPerimeter = 2 * (rect.width + rect.height);
 
-      // Vertical bars mirrored over top edge
-      if (Math.random() > 0.7) {
-        const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
-        const width = Math.random() * 10 + 2;
-        const x = rect.left + Math.random() * rect.width;
-        const length = Math.random() * 20 + 5;
-        cardLines.push({ x, y: rect.top - length, w: width, h: length * 2, color, alpha: Math.random() * 0.7 + 0.2 });
-      }
+  // Top edge
+  if (Math.random() > 1 - (rect.width / totalPerimeter)) {
+    const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
+    const width = Math.random() * 10 + 2;
+    const x = rect.left + Math.random() * rect.width;
+    const length = Math.random() * 20 + 5;
+    cardLines.push({ x, y: rect.top - length, w: width, h: length * 2, color, alpha: Math.random() * 0.7 + 0.2 });
+  }
 
-      // Vertical bars mirrored over bottom edge
-      if (Math.random() > 0.7) {
-        const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
-        const width = Math.random() * 10 + 2;
-        const x = rect.left + Math.random() * rect.width;
-        const length = Math.random() * 20 + 5;
-        cardLines.push({ x, y: rect.bottom - length, w: width, h: length * 2, color, alpha: Math.random() * 0.7 + 0.2 });
-      }
+  // Bottom edge
+  if (Math.random() > 1 - (rect.width / totalPerimeter)) {
+    const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
+    const width = Math.random() * 10 + 2;
+    const x = rect.left + Math.random() * rect.width;
+    const length = Math.random() * 20 + 5;
+    cardLines.push({ x, y: rect.bottom - length, w: width, h: length * 2, color, alpha: Math.random() * 0.7 + 0.2 });
+  }
 
-      // Horizontal bars mirrored over left edge
-      if (Math.random() > 0.7) {
-        const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
-        const height = Math.random() * 10 + 2;
-        const y = rect.top + Math.random() * rect.height;
-        const length = Math.random() * 20 + 5;
-        cardLines.push({ x: rect.left - length, y, w: length * 2, h: height, color, alpha: Math.random() * 0.7 + 0.2 });
-      }
+  // Left edge
+  if (Math.random() > 1 - (rect.height / totalPerimeter)) {
+    const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
+    const height = Math.random() * 10 + 2;
+    const y = rect.top + Math.random() * rect.height;
+    const length = Math.random() * 20 + 5;
+    cardLines.push({ x: rect.left - length, y, w: length * 2, h: height, color, alpha: Math.random() * 0.7 + 0.2 });
+  }
 
-      // Horizontal bars mirrored over right edge
-      if (Math.random() > 0.7) {
-        const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
-        const height = Math.random() * 10 + 2;
-        const y = rect.top + Math.random() * rect.height;
-        const length = Math.random() * 20 + 5;
-        cardLines.push({ x: rect.right - length, y, w: length * 2, h: height, color, alpha: Math.random() * 0.7 + 0.2 });
-      }
-    };
+  // Right edge
+  if (Math.random() > 1 - (rect.height / totalPerimeter)) {
+    const color = Math.random() > 0.5 ? "#ff003c" : "#00f5ff";
+    const height = Math.random() * 10 + 2;
+    const y = rect.top + Math.random() * rect.height;
+    const length = Math.random() * 20 + 5;
+    cardLines.push({ x: rect.right - length, y, w: length * 2, h: height, color, alpha: Math.random() * 0.7 + 0.2 });
+  }
+};
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
@@ -257,7 +258,7 @@ export default function Blackwall() {
         ctx.globalAlpha = line.alpha;
         ctx.fillStyle = line.color;
         ctx.fillRect(line.x, line.y, line.w, line.h);
-        line.alpha -= 0.003;
+        line.alpha -= 0.006;
         if (line.alpha <= 0) cardLines.splice(i, 1);
       });
 
