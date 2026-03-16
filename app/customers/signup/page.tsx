@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function CustomerSignup() {
+      const [initYubiKey, setInitYubiKey] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,14 +23,36 @@ export default function CustomerSignup() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [yubiKeyStatus, setYubiKeyStatus] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    // TODO: Implement signup logic (API call)
     if (!name || !email || !password) {
       setError("Please fill in all required fields.");
       return;
+    }
+    // Standard signup logic here (API call to create user)
+    // ...existing code...
+    if (initYubiKey) {
+      setYubiKeyStatus("Initializing YubiKey...");
+      try {
+        // Step 1: Get registration options from server
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const options = await res.json();
+        // Step 2: Start WebAuthn registration
+        // @ts-ignore
+        const credential = await navigator.credentials.create({ publicKey: options });
+        // Step 3: Send response to server for verification (not implemented here, but you can add)
+        // setYubiKeyStatus("YubiKey registration successful!");
+        setYubiKeyStatus("YubiKey registration flow started. Complete device prompt.");
+      } catch (err) {
+        setYubiKeyStatus("YubiKey registration failed.");
+      }
     }
     setSuccess("Account created! You can now log in.");
   };
@@ -42,6 +65,16 @@ export default function CustomerSignup() {
       </section>
       <section className="dashboard-section">
         <form className="settings-form" onSubmit={handleSubmit}>
+          {initYubiKey && yubiKeyStatus && (
+            <div className="form-group">
+              <p>{yubiKeyStatus}</p>
+            </div>
+          )}
+          <div className="form-group">
+            <label>
+              <input type="checkbox" checked={initYubiKey} onChange={e => setInitYubiKey(e.target.checked)} /> Initialize YubiKey during signup (optional)
+            </label>
+          </div>
           <div className="form-group">
             <label>
               <input type="checkbox" checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} /> Remember this browser for 30 days

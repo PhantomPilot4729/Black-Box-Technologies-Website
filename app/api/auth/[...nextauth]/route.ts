@@ -47,9 +47,7 @@ const handler = NextAuth({
         session.user.role = token.role;
       }
       // Optionally set custom session expiry if rememberMe is passed
-      if (token.rememberMe) {
-        session.maxAge = 30 * 24 * 60 * 60;
-      }
+      // (NextAuth handles session expiration internally)
       return session;
     },
     async jwt({ token, user, account, trigger, session }) {
