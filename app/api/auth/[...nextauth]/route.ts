@@ -32,6 +32,11 @@ const handler = NextAuth({
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 1 day
+  },
   pages: {
     signIn: "/login",
   },
@@ -41,11 +46,19 @@ const handler = NextAuth({
       if (typeof token?.role === "string" && session.user) {
         session.user.role = token.role;
       }
+      // Optionally set custom session expiry if rememberMe is passed
+      if (token.rememberMe) {
+        session.maxAge = 30 * 24 * 60 * 60;
+      }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user && typeof user === "object" && "role" in user && typeof user.role === "string") {
         token.role = user.role;
+      }
+      // Pass rememberMe from signIn to token
+      if (account && account.provider === "credentials" && typeof account.rememberMe !== "undefined") {
+        token.rememberMe = account.rememberMe;
       }
       return token;
     },
