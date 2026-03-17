@@ -23,7 +23,7 @@ export default function AccountSettings() {
   const [email, setEmail] = useState(session?.user?.email || "");
   const [password, setPassword] = useState("");
   const [showPasswordSection, setShowPasswordSection] = useState(false);
-  const [status, setStatus] = useState("");
+  const [updateStatus, setUpdateStatus] = useState("");
   const [yubiStatus, setYubiStatus] = useState("");
   // Yubikey registration/authentication
   async function handleRegisterYubiKey() {
@@ -39,18 +39,19 @@ export default function AccountSettings() {
       options.challenge = Uint8Array.from(atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
       options.user.id = Uint8Array.from(atob(options.user.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
       if (options.excludeCredentials) {
-        options.excludeCredentials = options.excludeCredentials.map((cred) => ({
+        options.excludeCredentials = options.excludeCredentials.map((cred: any) => ({
           ...cred,
           id: Uint8Array.from(atob(cred.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0))
         }));
       }
       const cred = await navigator.credentials.create({ publicKey: options });
       if (!cred) throw new Error("No credential returned");
-      const attestationResponse = cred.response;
+      const pkCred = cred as PublicKeyCredential;
+      const attestationResponse = pkCred.response as AuthenticatorAttestationResponse;
       const credentialJSON = {
-        id: cred.id,
-        type: cred.type,
-        rawId: btoa(String.fromCharCode(...new Uint8Array(cred.rawId))),
+        id: pkCred.id,
+        type: pkCred.type,
+        rawId: btoa(String.fromCharCode(...new Uint8Array(pkCred.rawId))),
         response: {
           clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(attestationResponse.clientDataJSON))),
           attestationObject: btoa(String.fromCharCode(...new Uint8Array(attestationResponse.attestationObject))),
@@ -83,18 +84,19 @@ export default function AccountSettings() {
       const options = await res.json();
       options.challenge = Uint8Array.from(atob(options.challenge.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0));
       if (options.allowCredentials) {
-        options.allowCredentials = options.allowCredentials.map((cred) => ({
+        options.allowCredentials = options.allowCredentials.map((cred: any) => ({
           ...cred,
           id: Uint8Array.from(atob(cred.id.replace(/-/g, "+").replace(/_/g, "/")), c => c.charCodeAt(0))
         }));
       }
       const assertion = await navigator.credentials.get({ publicKey: options });
       if (!assertion) throw new Error("No assertion returned");
-      const assertionResponse = assertion.response;
+      const pkAssertion = assertion as PublicKeyCredential;
+      const assertionResponse = pkAssertion.response as AuthenticatorAssertionResponse;
       const assertionJSON = {
-        id: assertion.id,
-        type: assertion.type,
-        rawId: btoa(String.fromCharCode(...new Uint8Array(assertion.rawId))),
+        id: pkAssertion.id,
+        type: pkAssertion.type,
+        rawId: btoa(String.fromCharCode(...new Uint8Array(pkAssertion.rawId))),
         response: {
           clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertionResponse.clientDataJSON))),
           authenticatorData: btoa(String.fromCharCode(...new Uint8Array(assertionResponse.authenticatorData))),
@@ -120,21 +122,26 @@ export default function AccountSettings() {
   // Account update handler
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setStatus("Saving changes...");
+    setUpdateStatus("Saving changes...");
     try {
-      const res = await fetch(`/api/customers/${session?.user?.id}`, {
+      const userId = (session?.user as any)?.id;
+      if (!userId) {
+        setUpdateStatus("❌ User ID not found. Unable to update account.");
+        return;
+      }
+      const res = await fetch(`/api/customers/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, mailingAddress, billingAddress, password })
       });
       const data = await res.json();
       if (res.ok) {
-        setStatus("✅ Account updated successfully!");
+        setUpdateStatus("✅ Account updated successfully!");
       } else {
-        setStatus("❌ Update failed: " + (data.error || "Unknown error"));
+        setUpdateStatus("❌ Update failed: " + (data.error || "Unknown error"));
       }
     } catch (err) {
-      setStatus(`❌ Error: ${err instanceof Error ? err.message : String(err)}`);
+      setUpdateStatus(`❌ Error: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -179,7 +186,7 @@ export default function AccountSettings() {
                     <button className="btn-primary" type="button" onClick={handleAuthenticateYubiKey}>Authenticate YubiKey</button>
                     {yubiStatus && <p style={{ marginTop: "1rem", color: "var(--neon-cyan)" }}>{yubiStatus}</p>}
                   </div>
-                  {status && <p style={{ marginTop: "1rem", color: "var(--neon-cyan)" }}>{status}</p>}
+                  {updateStatus && <p style={{ marginTop: "1rem", color: "var(--neon-cyan)" }}>{updateStatus}</p>}
         </form>
       </section>
     </main>
